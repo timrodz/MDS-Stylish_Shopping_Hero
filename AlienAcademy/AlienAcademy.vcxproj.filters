@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Framework">
+      <UniqueIdentifier>{781e3f7b-6ab1-4583-8087-563eba36472b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Entity">
+      <UniqueIdentifier>{206566cb-1ef2-4c40-913b-0958d1977695}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Framework">
+      <UniqueIdentifier>{3cd06ccb-2bdd-4e89-918a-a2a0d4ec5cdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Entity">
+      <UniqueIdentifier>{f1e4501b-7f0c-4d59-9deb-ae0de94eb7a5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="game.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="clock.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="backbuffer.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="placeholder.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="entity.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="cursor.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="level.cpp">
+      <Filter>Source Files\Framework</Filter>
+    </ClCompile>
+    <ClCompile Include="player.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="bullet.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="game.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="clock.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="backbuffer.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="placeholder.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="sprite.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="cursor.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="level.h">
+      <Filter>Header Files\Framework</Filter>
+    </ClInclude>
+    <ClInclude Include="player.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="bullet.h">
+      <Filter>Header Files\Entity</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
