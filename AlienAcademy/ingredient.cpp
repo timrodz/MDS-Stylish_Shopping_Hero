@@ -5,7 +5,7 @@
 #include "utils.h"
 
 // This Includes
-#include "bullet.h"
+#include "ingredient.h"
 
 // Static Variables
 
@@ -13,15 +13,19 @@
 
 // Implementation
 
-CBullet::CBullet()
+CIngredient::CIngredient()
 	: m_fVelocityY(0.0f)
 {}
 
-CBullet::~CBullet()
+CIngredient::CIngredient(std::string _name)
+	: m_name(_name)
+{
+}
+
+CIngredient::~CIngredient()
 {}
 
-bool
-CBullet::Initialise(short _iType, float _fPosX, float _fPosY, float _fVelocityY) {
+bool CIngredient::Initialise(short _iType, float _fPosX, float _fPosY, float _fVelocityY) {
 
 	m_iType = _iType;
 
@@ -47,14 +51,14 @@ CBullet::Initialise(short _iType, float _fPosX, float _fPosY, float _fVelocityY)
 }
 
 void
-CBullet::Draw() {
+CIngredient::Draw() {
 
 	CEntity::Draw();
 
 }
 
 void
-CBullet::Process(float _fDeltaTick) {
+CIngredient::Process(float _fDeltaTick) {
 
 	if (m_iType == 0) {
 
@@ -72,21 +76,21 @@ CBullet::Process(float _fDeltaTick) {
 }
 
 float
-CBullet::GetVelocityY() const {
+CIngredient::GetVelocityY() const {
 
 	return (m_fVelocityY);
 
 }
 
 void
-CBullet::SetVelocityY(float _fY) {
+CIngredient::SetVelocityY(float _fY) {
 
 	m_fVelocityY = _fY;
 
 }
 
 float
-CBullet::GetRadius() const {
+CIngredient::GetRadius() const {
 
 	return (GetWidth() / 2.0f);
 

@@ -4,13 +4,14 @@
 #include "Game.h"
 #include "player.h"
 //#include "alien.h"
-#include "bullet.h"
+#include "ingredient.h"
 #include "utils.h"
 #include "backbuffer.h"
 //#include "framecounter.h"
 #include "placeholder.h"
 //#include "barrier.h"
 //#include "resource.h"
+#include "recipeManager.h"
 
 // This Include
 #include "Level.h"
@@ -63,7 +64,7 @@ CLevel::~CLevel() {
 
 	while (m_vecEnemyBullets.size() > 0)
 	{
-		CBullet* pInvader = m_vecEnemyBullets[m_vecEnemyBullets.size() - 1];
+		CIngredient* pInvader = m_vecEnemyBullets[m_vecEnemyBullets.size() - 1];
 		
 		m_vecEnemyBullets.pop_back();
 
@@ -111,7 +112,7 @@ bool CLevel::Initialise(int _iWidth, int _iHeight)
 	const int kiGap = 5;
 
 	int iCurrentX = kiStartX;
-	int iCurrentY;
+	int iCurrentY = 0.0f;
 
 
 
@@ -247,7 +248,7 @@ void CLevel::Process(float _fDeltaTick) {
 	//if ((m_bCanShoot == true) && (m_fX > x) && (m_fX < (x + 1)) && (!m_bSpecial)) {
 	if (fTimer > 1.0f) 
 	{
-		CBullet* m_pBullet = new CBullet();
+		CIngredient* m_pBullet = new CIngredient();
 		float fVelocity = 125.0f;
 		m_pBullet->Initialise(1, x, 1.0f, fVelocity);
 		//m_bCanShoot = false;

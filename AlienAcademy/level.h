@@ -14,7 +14,7 @@
 // Constants
 
 // Prototypes
-class CBullet;
+class CIngredient;
 class CPlayer;
 class CAlien;
 class CBarrier;
@@ -71,7 +71,7 @@ protected:
 	CAlien* m_pSpecialAlien;
 	bool m_bSpecialAlien;
 
-	std::vector<CBullet*> m_vecEnemyBullets;
+	std::vector<CIngredient*> m_vecEnemyBullets;
 
 	CFPSCounter* m_fpsCounter;
 

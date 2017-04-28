@@ -1,7 +1,7 @@
 #pragma once
 
-#if !defined(__BALL_H__)
-#define __BALL_H__
+#if !defined(__INGREDIENT_H__)
+#define __INGREDIENT_H__
 
 // Library Includes
 
@@ -15,12 +15,13 @@
 // Prototypes
 class CSprite;
 
-class CBullet : public CEntity
+class CIngredient : public CEntity
 {
 	// Member Functions
 public:
-	CBullet();
-	virtual ~CBullet();
+	CIngredient();
+	CIngredient(std::string _name);
+	virtual ~CIngredient();
 
 	bool Initialise(short _iType, float _fPosX, float _fPosY, float _fVelocityY);
 
@@ -33,14 +34,16 @@ public:
 	float GetRadius() const;
 
 private:
-	CBullet(const CBullet& _kr);
-	CBullet& operator= (const CBullet& _kr);
+	CIngredient(const CIngredient& _kr);
+	CIngredient& operator= (const CIngredient& _kr);
+
 
 	// Member Variables
 public:
 
 protected:
 	float m_fVelocityY;
+	std::string m_name;
 
 private:
 	int m_iType;
