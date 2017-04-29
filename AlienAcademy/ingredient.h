@@ -33,6 +33,8 @@ public:
 
 	float GetRadius() const;
 
+	std::string GetName();
+
 private:
 	CIngredient(const CIngredient& _kr);
 	CIngredient& operator= (const CIngredient& _kr);

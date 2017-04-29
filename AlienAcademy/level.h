@@ -20,6 +20,7 @@ class CAlien;
 class CBarrier;
 class CFPSCounter;
 class CPlaceHolder;
+class CRecipeManager;
 
 class CLevel
 {
@@ -51,6 +52,7 @@ protected:
 
 	void UpdateScoreText();
 	void DrawScore();
+	void DrawRecipe();
 
 public:
 	CPlayer* GetPlayer() const;
@@ -85,6 +87,8 @@ protected:
 	static int m_iPlayerLives;
 
 	int m_iLowestAlien[10];
+
+	CRecipeManager* m_recipeManager;
 
 private:
 	int m_iPreviousAlienShipSpeed;

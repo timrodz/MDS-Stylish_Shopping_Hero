@@ -21,6 +21,9 @@ public:
 	void CreateChickenTeriyaki();
 	void CreateShephersPie();
 
+	std::vector<CIngredient*> getIngredients();
+	std::string getName();
+
 private:
 	
 	std::vector<CIngredient*> m_vecIngredients;

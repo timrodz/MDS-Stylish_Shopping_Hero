@@ -308,8 +308,8 @@ CreateAndRegisterWindow(HINSTANCE _hInstance, int _iWidth, int _iHeight, const w
 	int screenY = GetSystemMetrics(SM_CYSCREEN);
 
 	// Center it based on the screens resolution minus the window's dimensions
-	int centerX = (screenX / 2) - (kiWidth / 2);
-	int centerY = (screenY / 2) - (kiHeight / 2);
+	int centerX = (screenX / 2) - (kiWidth / 2) + 35;
+	int centerY = (screenY / 2) - (kiHeight / 2) - 5;
 
 	HWND hwnd = CreateWindowEx(
 		NULL,

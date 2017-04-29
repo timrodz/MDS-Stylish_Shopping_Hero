@@ -58,7 +58,7 @@ void CRecipe::CreateChocolateCake()
 	CIngredient Eggs("Eggs");
 	CIngredient Vanilla("Vanilla");
 	CIngredient Chocolate("Chocolate");
-	m_name = "Chocolate Cake";
+	m_name = "CHOCOLATE CAKE";
 	m_vecIngredients.push_back(new CIngredient("Flour"));
 	m_vecIngredients.push_back(new CIngredient("Sugar"));
 	m_vecIngredients.push_back(new CIngredient("Milk"));
@@ -74,9 +74,9 @@ void CRecipe::CreatePavlova()
 	CIngredient Cornflower("Cornflower");
 	CIngredient Cream("Cream");
 	CIngredient Berries("Berries");
-	m_name = "Pavlova";
+	m_name = "PAVLOVA";
 	m_vecIngredients.push_back(new CIngredient("Sugar"));
-	m_vecIngredients.push_back(new CIngredient("EggWhites"));
+	m_vecIngredients.push_back(new CIngredient("Egg Whites"));
 	m_vecIngredients.push_back(new CIngredient("Cornflower"));
 	m_vecIngredients.push_back(new CIngredient("Cream"));
 	m_vecIngredients.push_back(new CIngredient("Vanilla"));
@@ -91,8 +91,8 @@ void CRecipe::CreateSpaghettiBolognese()
 	CIngredient Onions("Onions");
 	CIngredient Mushrooms("Mushrooms");
 	CIngredient Oregano("Oregano");
-	m_name = "Spaghetti Bolognese";
-	m_vecIngredients.push_back(new CIngredient("BeefMince"));
+	m_name = "SPAGHETTI BOLOGNESE";
+	m_vecIngredients.push_back(new CIngredient("Beef Mince"));
 	m_vecIngredients.push_back(new CIngredient("Spaghetti"));
 	m_vecIngredients.push_back(new CIngredient("Tomatoes"));
 	m_vecIngredients.push_back(new CIngredient("Onions"));
@@ -106,7 +106,7 @@ void CRecipe::CreateHawaiianPizza()
 	CIngredient Ham("Ham");
 	CIngredient Cheese("Cheese");
 	CIngredient Pineapple("Pineapple");
-	m_name = "Hawaiian Pizza";
+	m_name = "HAWAIIAN PIZZA";
 	m_vecIngredients.push_back(new CIngredient("Flour"));
 	m_vecIngredients.push_back(new CIngredient("Yeast"));
 	m_vecIngredients.push_back(new CIngredient("Ham"));
@@ -123,13 +123,13 @@ void CRecipe::CreateChickenTeriyaki()
 	CIngredient Honey("Honey");
 	CIngredient Rice("Rice");
 	CIngredient OrangeJuice("Orange Juice");
-	m_name = "Chicken Teriyaki";
+	m_name = "CHICKEN TERIYAKI";
 	m_vecIngredients.push_back(new CIngredient("Chicken"));
-	m_vecIngredients.push_back(new CIngredient("SoySauce"));
+	m_vecIngredients.push_back(new CIngredient("Soy Sauce"));
 	m_vecIngredients.push_back(new CIngredient("Ginger"));
 	m_vecIngredients.push_back(new CIngredient("Honey"));
 	m_vecIngredients.push_back(new CIngredient("Rice"));
-	m_vecIngredients.push_back(new CIngredient("OrangeJuice"));
+	m_vecIngredients.push_back(new CIngredient("Orange Juice"));
 }
 
 void CRecipe::CreateShephersPie()
@@ -137,7 +137,7 @@ void CRecipe::CreateShephersPie()
 	CIngredient Potatoes("Potatoes");
 	CIngredient Carrots("Carrots");
 	CIngredient Peas("Peas");
-	m_name = "Shepherd's Pie";
+	m_name = "SHEPHERD'S PIE";
 	m_vecIngredients.push_back(new CIngredient("Potatoes"));
 	m_vecIngredients.push_back(new CIngredient("Beef Mince"));
 	m_vecIngredients.push_back(new CIngredient("Carrots"));
@@ -145,4 +145,14 @@ void CRecipe::CreateShephersPie()
 	m_vecIngredients.push_back(new CIngredient("Cheese"));
 	m_vecIngredients.push_back(new CIngredient("Flour"));
 	m_vecIngredients.push_back(new CIngredient("Peas"));
+}
+
+std::vector<CIngredient*> CRecipe::getIngredients()
+{
+	return m_vecIngredients;
+}
+
+std::string CRecipe::getName()
+{
+	return m_name;
 }

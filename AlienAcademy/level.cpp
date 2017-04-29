@@ -12,6 +12,7 @@
 //#include "barrier.h"
 //#include "resource.h"
 #include "recipeManager.h"
+#include "recipe.h"
 
 // This Include
 #include "Level.h"
@@ -74,6 +75,9 @@ CLevel::~CLevel() {
 	delete m_pPlayer;
 	m_pPlayer = 0;
 
+	delete m_recipeManager;
+	m_recipeManager = 0;
+
 	//delete m_fpsCounter;
 	//m_fpsCounter = 0;
 
@@ -114,7 +118,8 @@ bool CLevel::Initialise(int _iWidth, int _iHeight)
 	int iCurrentX = kiStartX;
 	int iCurrentY = 0.0f;
 
-
+	m_recipeManager = new CRecipeManager();
+	//m_recipeManager->CreateRecipe();
 
 /*
 	for (int i = 0; i < ALIEN_COLUMNS; i++) {
@@ -232,6 +237,7 @@ void CLevel::Draw() {
 	//	m_pSpecialAlien->Draw();
 
 	//DrawScore();
+	DrawRecipe();
 
 }
 
@@ -708,6 +714,59 @@ void CLevel::DrawScore() {
 
 	DeleteObject(font);
 
+}
+
+void CLevel::DrawRecipe()
+{
+	HDC hdc = CGame::GetInstance().GetBackBuffer()->GetBFDC();
+
+	int kiX = 0;
+	int kiY = 10;
+	SetBkMode(hdc, TRANSPARENT);
+
+	HFONT font = CreateFontA(23, 11, 0, 0,
+		FW_NORMAL, FALSE, FALSE, FALSE,
+		ANSI_CHARSET, OUT_DEFAULT_PRECIS,
+		CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY,
+		DEFAULT_PITCH | FF_DONTCARE,
+		"SmackyFormula");
+
+	SelectObject(hdc, font);
+	
+	SetTextAlign(hdc, TA_LEFT);
+	//SetTextAlign(hdc, TA_RIGHT);
+	std::vector<CRecipe*> _vecRecipes = m_recipeManager->getRecipes();
+	for (unsigned int i = 0; i < _vecRecipes.size(); i++)
+	{	
+		kiY = 10;
+		SetTextColor(hdc, RGB(0, 0, 255));
+		std::string _strRecipe = _vecRecipes[i]->getName();
+		TextOutA(hdc, kiX, kiY, _strRecipe.c_str(), static_cast<int>(_strRecipe.size()));
+
+		std::vector<CIngredient*> _ingredients = _vecRecipes[i]->getIngredients();
+		for (unsigned int j = 0; j < _ingredients.size(); j++)
+		{
+			if (j == 0)
+			{
+				kiY = 40;
+			}
+			else
+			{
+				kiY += 20;
+			}
+			
+			SetTextColor(hdc, RGB(200, 200, 200));
+			SetTextColor(hdc, RGB(0, 0, 0));		
+			std::string _strIngredient = _ingredients[j]->GetName();
+			TextOutA(hdc, kiX, kiY, _strIngredient.c_str(), static_cast<int>(_strIngredient.size()));
+		}	
+
+		kiX = m_iWidth / 2 + 5;		
+	}
+	
+	//SetTextColor(hdc, RGB(0, 0, 0));
+
+	DeleteObject(font);
 }
 
 void CLevel::UpdateScoreText() {

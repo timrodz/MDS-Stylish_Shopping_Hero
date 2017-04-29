@@ -13,12 +13,16 @@ public:
 	CRecipeManager();
 	~CRecipeManager();
 
-	void CreateRecipes();
+	void CreateRecipe();
+
+	std::vector<CRecipe*> getRecipes();
 
 private:
 
-	std::vector<CRecipe> m_vecRecipes;
-	CRecipe* m_Recipe;
+	std::vector<CRecipe*> m_vecRecipes;
+	
+	CRecipe* m_Recipe1;
+	CRecipe* m_Recipe2;
 };
 
 #endif
