@@ -22,7 +22,6 @@ public:
 	CEntity();
 	virtual ~CEntity();
 
-	//virtual bool Initialise(const int _kiSpriteID, const int _kiMaskID);
 	virtual bool Initialise(std::wstring _strFileName, std::wstring _strFileMask, int _iWidth = 0, int _iHeight = 0);
 
 	virtual void Draw() = 0;

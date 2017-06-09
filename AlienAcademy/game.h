@@ -35,7 +35,7 @@ class CGame
 public:
 	virtual ~CGame();
 
-	virtual bool Initialise(HINSTANCE _hInstance, HWND _hWnd, int _iWidth, int _iHeight);
+	virtual bool Initialise(HINSTANCE _hInstance, HWND _hWnd, int _iWidth, int _iHeight, CBackBuffer* _pBackBuffer);
 
 	virtual void Draw();
 	virtual void Process(float _fDeltaTick);

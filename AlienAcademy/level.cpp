@@ -1,18 +1,20 @@
 // Library Includes
 #include <ctime>
+
+#include <windows.h>
+#include <string>
+#include <algorithm>
+#include "Mmsystem.h"
+
+
 // Local Includes
 #include "Game.h"
 #include "player.h"
-//#include "alien.h"
 #include "ingredient.h"
 #include "utils.h"
 #include "backbuffer.h"
-//#include "framecounter.h"
-#include "placeholder.h"
-//#include "barrier.h"
-//#include "resource.h"
-#include "recipeManager.h"
 #include "recipe.h"
+#include "resource.h"
 
 // This Include
 #include "Level.h"
@@ -22,8 +24,8 @@
 #define ALIEN_ROWS 5
 
 // Static Variables
-int CLevel::m_iScore = 0;
-int CLevel::m_iPlayerLives = 3;
+int CLevel::m_iScoreA = 0;
+int CLevel::m_iScoreB = 0;
 
 // Static Function Prototypes
 
@@ -32,167 +34,97 @@ int CLevel::m_iPlayerLives = 3;
 #define CHEAT_BOUNCE_ON_BACK_WALL
 
 CLevel::CLevel()
-	: m_iAliensRemaining(0)
-	, m_pPlayer(0)
+	: m_pPlayer1(0)
+	, m_pPlayer2(0)
 	, m_iWidth(0)
 	, m_iHeight(0)
-	, m_fpsCounter(0)
-	, m_pSpecialAlien(0)
-	, m_bSpecialAlien(false)
-	, m_iPreviousAlienShipSpeed(20)
 	, fTimer(0.0f)
 {
 
-	m_iLowestAlien[10] = (0);
-
 }
 
-CLevel::~CLevel() {
+CLevel::~CLevel()
+{
 
-	/*for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-		while (m_aliens[i].size() > 0) {
-
-			CAlien* pBrick = m_aliens[i].at(m_aliens[i].size() - 1);
-
-			m_aliens[i].pop_back();
-
-			delete pBrick;
-
-		}
-
-	}*/
-
-	while (m_vecEnemyBullets.size() > 0)
+	while (m_vecIngredients.size() > 0)
 	{
-		CIngredient* pInvader = m_vecEnemyBullets[m_vecEnemyBullets.size() - 1];
-		
-		m_vecEnemyBullets.pop_back();
+		CIngredient* pIngredient = m_vecIngredients[m_vecIngredients.size() - 1];
 
-		delete pInvader;
+		m_vecIngredients.pop_back();
+
+		delete pIngredient;
 	}
 
-	delete m_pPlayer;
-	m_pPlayer = 0;
+	delete m_pPlayer1;
+	m_pPlayer1 = 0;
 
-	delete m_recipeManager;
-	m_recipeManager = 0;
-
-	//delete m_fpsCounter;
-	//m_fpsCounter = 0;
+	delete m_pPlayer2;
+	m_pPlayer2 = 0;
 
 }
 
 ////////////////////////////////////////////////////////////
 
-bool CLevel::Initialise(int _iWidth, int _iHeight) 
+bool CLevel::Initialise(int _iWidth, int _iHeight)
 {
 	m_iWidth = _iWidth;
 	m_iHeight = _iHeight - 35;
 
-	m_pPlayer = new CPlayer();
-	VALIDATE(m_pPlayer->Initialise());
-	m_pPlayer->SetScreenWidth(_iWidth);
-	m_pPlayer->SetScreenHeight(_iHeight);
+	m_pPlayer1 = new CPlayer(true);
 
-	// Set the paddle's position to be centered on the x, 
-	// and a little bit up from the bottom of the window.
-	m_pPlayer->SetX(m_iWidth / 4.0f);
-	m_pPlayer->SetY(m_iHeight - (2 * m_pPlayer->GetHeight() / 2));
+	VALIDATE(m_pPlayer1->Initialise());
+	m_pPlayer1->SetScreenWidth(_iWidth);
+	m_pPlayer1->SetScreenHeight(_iHeight);
 
-	m_pPlayer2 = new CPlayer();
+	m_pPlayer1->SetX(m_iWidth / 4.0f);
+	m_pPlayer1->SetY(m_iHeight - (2 * m_pPlayer1->GetHeight() / 2));
+
+	m_pPlayer2 = new CPlayer(false);
 	VALIDATE(m_pPlayer2->Initialise());
 	m_pPlayer2->SetLeftPlayer(false);
 	m_pPlayer2->SetScreenWidth(_iWidth);
 	m_pPlayer2->SetScreenHeight(_iHeight);
 
-	// Set the paddle's position to be centered on the x, 
-	// and a little bit up from the bottom of the window.
-	m_pPlayer2->SetX(m_iWidth * 3.0f/ 4.0f);
-	m_pPlayer2->SetY(m_iHeight - (2 * m_pPlayer2->GetHeight() / 2));
+	m_pPlayer2->SetX(m_iWidth * 3.0f / 4.0f);
+	m_pPlayer2->SetY(m_iHeight - (2 * m_pPlayer2->GetHeight() / 2 -35));
 
 	const int kiNumAliens = 55;
 	const int kiStartX = _iWidth / 6 - 35 + ALIEN_COLUMNS;
 	const int kiGap = 5;
 
 	int iCurrentX = kiStartX;
-	int iCurrentY = 0.0f;
+	int iCurrentY = 0;
 
-	m_recipeManager = new CRecipeManager();
-	//m_recipeManager->CreateRecipe();
+	CreateRecipe();
 
-/*
-	for (int i = 0; i < ALIEN_COLUMNS; i++) {
+	UpdateScoreText();
 
-		m_aliens[i].clear();
-		iCurrentY = 60;
 
-		for (int j = 0; j < ALIEN_ROWS; j++) {
+	float fVelocity = 180.0f;
+	CRecipe* _recipe1 = m_pPlayer1->GetRecipe();
+	int x = 0;
+	std::vector<CIngredient*> _ingredients = _recipe1->getIngredients();
+	for (unsigned int i = 0; i < _ingredients.size(); i++)
+	{
+		x = (rand() % (m_iWidth / 2 - 100)) + 50;
+		int type = _ingredients[i]->GetType();
 
-			CAlien* pAlien;
-
-			if (j == 0)
-				pAlien = new CAlien(40);
-			else if (j == 1 || j == 2)
-				pAlien = new CAlien(30);
-			else
-				pAlien = new CAlien(20);
-
-			VALIDATE(pAlien->Initialise());
-
-			pAlien->SetX(static_cast<float>(iCurrentX));
-			pAlien->SetY(static_cast<float>(iCurrentY));
-
-			iCurrentY += 50;
-
-			m_aliens[i].push_back(pAlien);
-
-		}
-
-		iCurrentX += static_cast<int>(12 * kiGap);
-
-		if (iCurrentX > (_iWidth / 2 + _iWidth / 4 + _iWidth / 6)) {
-
-			iCurrentX = kiStartX;
-			iCurrentY += 50;
-
-		}
-
+		CIngredient* _pIngredient = new CIngredient();
+		_pIngredient->Initialise(type, (float)x, 1.0f, fVelocity);
+		m_vecFixedIngredients.push_back(_pIngredient);
 	}
 
-	// Draw the barriers
-	m_barriers.clear();
-
-	for (int i = 0; i < 4; i++) {
-
-		CBarrier* barrier = new CBarrier();
-		barrier->Initialise();
-		barrier->SetX(110.0f + (i * 175.0f));
-		barrier->SetY(m_iHeight - 200.0f);
-
-		m_barriers.push_back(barrier);
-
+	int randomIngredient = (rand() % 41);
+	for (int i = 0; i <= 41; i++)
+	{
+		x = (rand() % (m_iWidth / 2 - 100)) + 50;
+		CIngredient* _pIngredient = new CIngredient();
+		_pIngredient->Initialise(i, (float)x, 1.0f, fVelocity);
+		m_vecFixedIngredients.push_back(_pIngredient);
 	}
 
-	m_lifeIcons.clear();
+	std::random_shuffle(m_vecFixedIngredients.begin(), m_vecFixedIngredients.end());
 
-	// Draw the lives
-	for (int i = 0; i < m_iPlayerLives; i++) {
-
-		CPlaceHolder* icon = new CPlaceHolder();
-		icon->Initialise();
-		icon->ChangeImage(IDB_PLAYER_LIFE, IDB_PLAYER_LIFE_MASK);
-		icon->SetX(30.0f + (i * 40.0f));
-		icon->SetY(m_iHeight + 10.0f);
-
-		m_lifeIcons.push_back(icon);
-
-	}
-	
-	SetAliensRemaining(ALIEN_COLUMNS * ALIEN_ROWS);
-	m_fpsCounter = new CFPSCounter();
-	VALIDATE(m_fpsCounter->Initialise());
-	*/
 	return (true);
 
 }
@@ -201,473 +133,180 @@ bool CLevel::Initialise(int _iWidth, int _iHeight)
 
 void CLevel::Draw() {
 
-	m_pPlayer->Draw();
+	m_pPlayer1->Draw();
 	m_pPlayer2->Draw();
 
-	for (unsigned int i = 0; i < m_vecEnemyBullets.size(); i++)
+	for (unsigned int i = 0; i < m_vecIngredients.size(); i++)
 	{
-		m_vecEnemyBullets[i]->Draw();
+		m_vecIngredients[i]->Draw();
 	}
 
-	// Draw the life icons
-	//for (unsigned int i = 0; i < m_lifeIcons.size(); i++) {
-
-	//	m_lifeIcons[i]->Draw();
-
-	//}
-
-	//// Draw the barriers
-	//for (unsigned int i = 0; i < m_barriers.size(); i++) {
-
-	//	m_barriers[i]->Draw();
-
-	//}
-
-	//for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//	for (int j = 0; j < ALIEN_ROWS; j++) {
-
-	//		m_aliens[i].at(j)->Draw();
-
-	//	}
-
-	//}
-
-	//if (m_pSpecialAlien != nullptr)
-	//	m_pSpecialAlien->Draw();
-
-	//DrawScore();
+	DrawScore();
 	DrawRecipe();
 
 }
 
 ////////////////////////////////////////////////////////////
 
-void CLevel::Process(float _fDeltaTick) {
+void CLevel::Process(float _fDeltaTick)
+{
 
-	m_pPlayer->Process(_fDeltaTick);
+	CheckGameOver();
+
+	m_pPlayer1->Process(_fDeltaTick);
 	m_pPlayer2->Process(_fDeltaTick);
 
-	// Bullets
-	int x = (rand() % m_iWidth - 50) + 50;
+	int x = (rand() % (m_iWidth / 2 - 100)) + 50;
 
-	//if ((m_bCanShoot == true) && (m_fX > x) && (m_fX < (x + 1)) && (!m_bSpecial)) {
-	if (fTimer > 1.0f) 
+	if (fTimer > 0.8f)
 	{
-		CIngredient* m_pBullet = new CIngredient();
-		float fVelocity = 125.0f;
-		m_pBullet->Initialise(1, x, 1.0f, fVelocity);
-		//m_bCanShoot = false;
-		//m_bBulletHasBeenReset = false;
-		m_vecEnemyBullets.push_back(m_pBullet);
+		/*CIngredient* _pIngredient = new CIngredient();
+		float fVelocity = 200.0f;
+		int randomIngredient = (rand() % 41);
+		_pIngredient->Initialise(randomIngredient, (float)x, 1.0f, fVelocity);
+		m_vecIngredients.push_back(_pIngredient);
+
+		CIngredient* _pIngredient2 = new CIngredient();
+		_pIngredient2->Initialise(randomIngredient, (float)x + m_iWidth / 2, 1.0f, fVelocity);
+		m_vecIngredients.push_back(_pIngredient2);*/
+
+		if (iIndex >= m_vecFixedIngredients.size())
+		{
+			iIndex = 0;
+		}
+		////CIngredient* _pIngredient = new CIngredient();
+		float fVelocity = 180.0f;
+		//int randomIngredient = (rand() % 41);
+		//_pIngredient->Initialise(randomIngredient, (float)x, 1.0f, fVelocity);
+		//m_vecIngredients.push_back(_pIngredient);
+
+		//CIngredient* _pIngredient2 = new CIngredient();
+		//_pIngredient2->Initialise(randomIngredient, (float)x + m_iWidth / 2, 1.0f, fVelocity);
+		//m_vecIngredients.push_back(_pIngredient2);
+
+		CIngredient* ingredientFromArray = m_vecFixedIngredients[iIndex];
+		int type = ingredientFromArray->GetType();
+
+		CIngredient* _pIngredient = new CIngredient();
+		_pIngredient->Initialise(type, (float)x, 1.0f, fVelocity);
+		m_vecIngredients.push_back(_pIngredient);
+
+		CIngredient* _pIngredient2 = new CIngredient();
+		_pIngredient2->Initialise(type, (float)x + m_iWidth / 2, 1.0f, fVelocity);
+		m_vecIngredients.push_back(_pIngredient2);
+
+		iIndex++;
 
 		fTimer = 0.0f;
 	}
 	fTimer += _fDeltaTick;
 
-	for (unsigned int i = 0; i < m_vecEnemyBullets.size(); i++)
+	for (unsigned int i = 0; i < m_vecIngredients.size(); i++)
 	{
-		m_vecEnemyBullets[i]->Process(_fDeltaTick);
+		m_vecIngredients[i]->Process(_fDeltaTick);
 	}
 
-	// Process the life icons
-	//for (unsigned int i = 0; i < m_lifeIcons.size(); i++) {
-
-	//	m_lifeIcons[i]->Process(_fDeltaTick);
-
-	//}
-
-	//// Process the barriers
-	//for (unsigned int i = 0; i < m_barriers.size(); i++) {
-
-	//	m_barriers[i]->Process(_fDeltaTick);
-
-	//}
-
-	////ProcessBulletEdgeCollision();
-	//ProcessPlayerBulletCollision();
-	//ProcessAlienBulletCollision();
-
-	//ProcessCheckForWin();
-
-	//// Check alien edge of screen
-	//// Check if movement change needs to occur
-
-	//bool bLeft = false;
-	//bool bRight = false;
-
-	//for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//	for (int j = 0; j < ALIEN_ROWS; j++) {
-
-	//		if (!m_aliens[i].at(j)->IsHit()) {
-
-	//			// Check if aliens need to move left
-	//			if (((m_aliens[i].at(j)->GetX()) + ((m_aliens[i].at(j)->GetWidth()) / 2)) > 740) {
-
-	//				bLeft = true;
-	//			}
-
-
-	//			// Check if aliens need to move right
-	//			if (((m_aliens[i].at(j)->GetX()) - ((m_aliens[i].at(j)->GetWidth()) / 2)) < 6) {
-
-	//				bRight = true;
-	//			}
-
-	//		}
-
-	//	}
-
-	//}
-
-	//// Adjust the bool variables for each alien accordingly
-	//for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//	for (int j = 0; j < ALIEN_ROWS; j++) {
-
-	//		if (!m_aliens[i].at(j)->IsHit()) {
-
-	//			if (bLeft == true) {
-
-	//				m_aliens[i].at(j)->SetMoveLeft(true);
-	//				m_aliens[i].at(j)->SetMoveRight(false);
-
-	//			}
-	//			else if (bRight == true) {
-
-	//				m_aliens[i].at(j)->SetMoveLeft(false);
-	//				m_aliens[i].at(j)->SetMoveRight(true);
-
-	//			}
-	//			else {
-
-	//				m_aliens[i].at(j)->SetMoveLeft(false);
-	//				m_aliens[i].at(j)->SetMoveRight(false);
-
-	//			}
-
-	//		}
-
-	//	}
-
-	//}
-
-	//// Find lowest alien ship in each column
-	//int count = 0;
-
-	//for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//	for (int j = 0; j < ALIEN_ROWS; j++) {
-
-	//		if (!m_aliens[i].at(j)->IsHit()) {
-
-	//			m_iLowestAlien[i] = j;
-
-	//		}
-	//		else {
-
-	//			count++;
-
-	//		}
-	//		if (count == 5) { // Column empty
-
-	//			m_iLowestAlien[i] = 9;
-
-	//		}
-
-	//	}
-
-	//	count = 0;
-
-	//}
-
-	//// Set can shoot
-	//for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//	if (m_iLowestAlien[i] != 9) {
-
-	//		m_aliens[i].at(m_iLowestAlien[i])->SetCanShoot();
-	//	}
-
-	//}
-
-	//// Process the aliens
-	//for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//	for (int j = 0; j < ALIEN_ROWS; j++) {
-
-	//		m_aliens[i].at(j)->Process(_fDeltaTick);
-
-	//		if (m_aliens[i].at(j)->GetY() >= m_iHeight / 2 + 125) {
-
-	//			CGame::GetInstance().GameOver();
-
-	//		}
-
-	//	}
-
-	//}
-
-	//// Creating a special alien
-	//if ((m_iAliensRemaining == 39 || m_iAliensRemaining == 12) && !m_bSpecialAlien) {
-
-	//	m_pSpecialAlien = new CAlien(100);
-	//	m_pSpecialAlien->Initialise();
-	//	m_pSpecialAlien->SetX(-30);
-	//	m_pSpecialAlien->SetY(30);
-	//	m_pSpecialAlien->SetShipSpeed(60);
-	//	m_pSpecialAlien->SetCanShoot();
-	//	m_pSpecialAlien->Process(_fDeltaTick);
-	//	m_pSpecialAlien->SetSpecial();
-	//	m_bSpecialAlien = true;
-
-	//}
-
-	//if (m_pSpecialAlien != nullptr) {
-
-	//	m_pSpecialAlien->Process(_fDeltaTick);
-	//	m_bSpecialAlien = false;
-
-	//}
-
-	//// Update the game's FPS
-	//m_fpsCounter->CountFramesPerSecond(_fDeltaTick);
-
-}
-
-void CLevel::SetLives(int _iLives) {
-
-	CLevel::m_iPlayerLives = _iLives;
-
-}
-
-////////////////////////////////////////////////////////////
-
-void CLevel::ProcessPlayerBulletCollision() {
-
-	//if (m_pPlayer->GetBullet() != nullptr) {
-
-	//	float fBulletR = m_pPlayer->GetBullet()->GetRadius();
-	//	float fBulletX = m_pPlayer->GetBullet()->GetX();
-	//	float fBulletY = m_pPlayer->GetBullet()->GetY();
-
-	//	// Bullet on barrier
-	//	for (unsigned int i = 0; i < m_barriers.size(); i++) {
-
-	//		if (!m_barriers[i]->IsHit()) {
-
-	//			float fBarrierX = m_barriers[i]->GetX();
-	//			float fBarrierY = m_barriers[i]->GetY();
-	//			float fBarrierH = m_barriers[i]->GetHeight();
-	//			float fBarrierW = m_barriers[i]->GetWidth();
-
-	//			if ((fBulletX + fBulletR > fBarrierX - fBarrierW / 2) &&
-	//				(fBulletX - fBulletR < fBarrierX + fBarrierW / 2) &&
-	//				(fBulletY + fBulletR > fBarrierY - fBarrierH / 2) &&
-	//				(fBulletY - fBulletR < fBarrierY + fBarrierH / 2))
-	//			{
-
-	//				m_pPlayer->DestroyBullet();
-	//				m_barriers[i]->LoseALife();
-
-	//				return;
-
-	//			}
-
-	//		}
-
-	//	}
-
-	//	// Bullet on alien
-	//	for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//		for (int j = 0; j < ALIEN_ROWS; j++) {
-
-	//			if (!m_aliens[i].at(j)->IsHit()) {
-
-	//				float fAlienX = m_aliens[i].at(j)->GetX();
-	//				float fAlienY = m_aliens[i].at(j)->GetY();
-	//				float fAlienH = m_aliens[i].at(j)->GetHeight();
-	//				float fAlienW = m_aliens[i].at(j)->GetWidth();
-
-	//				if ((fBulletX + fBulletR > fAlienX - fAlienW / 2) &&
-	//					(fBulletX - fBulletR < fAlienX + fAlienW / 2) &&
-	//					(fBulletY + fBulletR > fAlienY - fAlienH / 2) &&
-	//					(fBulletY - fBulletR < fAlienY + fAlienH / 2))
-	//				{
-
-	//					m_iScore += m_aliens[i].at(j)->GetAwardedPoints();
-
-	//					m_pPlayer->DestroyBullet();
-
-	//					m_aliens[i].at(j)->SetHit(true);
-
-	//					SetAliensRemaining(GetAliensRemaining() - 1);
-
-	//					SetAlienShipSpeed(m_aliens[i].at(j)->GetShipSpeed() + 3.5f);
-
-	//					return;
-
-	//				}
-
-	//			}
-
-	//		}
-
-	//	}
-
-	//	// Special alien
-	//	if (m_pSpecialAlien != nullptr) {
-
-	//		if (!m_pSpecialAlien->IsHit()) {
-
-	//			float fAlienX = m_pSpecialAlien->GetX();
-	//			float fAlienY = m_pSpecialAlien->GetY();
-	//			float fAlienH = m_pSpecialAlien->GetHeight();
-	//			float fAlienW = m_pSpecialAlien->GetWidth();
-
-	//			if ((fBulletX + fBulletR > fAlienX - fAlienW / 2) &&
-	//				(fBulletX - fBulletR < fAlienX + fAlienW / 2) &&
-	//				(fBulletY + fBulletR > fAlienY - fAlienH / 2) &&
-	//				(fBulletY - fBulletR < fAlienY + fAlienH / 2))
-	//			{
-
-	//				m_iScore += m_pSpecialAlien->GetAwardedPoints();
-
-	//				m_pPlayer->DestroyBullet();
-
-	//				m_pSpecialAlien->SetHit(true);
-
-	//				UpdateScoreText();
-
-	//				return;
-
-	//			}
-
-	//		}
-
-	//	}
-
-	//	// Bullet on edge
-	//	if (m_pPlayer->GetBullet() != nullptr) {
-
-	//		if (m_pPlayer->GetBullet()->GetY() < -m_pPlayer->GetBullet()->GetHeight()) {
-
-	//			m_pPlayer->DestroyBullet();
-
-	//		}
-
-	//	}
-
-	//}
-
-}
-
-void CLevel::ProcessAlienBulletCollision() {
-
-	//if (!m_pPlayer->IsHit()) {
-
-	//	float fPlayerX = m_pPlayer->GetX();
-	//	float fPlayerY = m_pPlayer->GetY();
-	//	float fPlayerH = m_pPlayer->GetHeight();
-	//	float fPlayerW = m_pPlayer->GetWidth();
-
-	//	for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-	//		for (int j = 0; j < ALIEN_ROWS; j++) {
-
-	//			if (!m_aliens[i].at(j)->IsHit()) {
-
-	//				if (m_aliens[i].at(j)->GetBullet() != nullptr) {
-
-	//					float fBulletR = m_aliens[i].at(j)->GetBullet()->GetRadius();
-	//					float fBulletX = m_aliens[i].at(j)->GetBullet()->GetX();
-	//					float fBulletY = m_aliens[i].at(j)->GetBullet()->GetY();
-
-	//					// Process the barriers
-	//					for (unsigned int k = 0; k < m_barriers.size(); k++) {
-
-	//						if (!m_barriers[k]->IsHit()) {
-
-	//							float fBarrierX = m_barriers[k]->GetX();
-	//							float fBarrierY = m_barriers[k]->GetY();
-	//							float fBarrierH = m_barriers[k]->GetHeight();
-	//							float fBarrierW = m_barriers[k]->GetWidth();
-
-	//							if ((fBulletX + fBulletR > fBarrierX - fBarrierW / 2) &&
-	//								(fBulletX - fBulletR < fBarrierX + fBarrierW / 2) &&
-	//								(fBulletY + fBulletR > fBarrierY - fBarrierH / 2) &&
-	//								(fBulletY - fBulletR < fBarrierY + fBarrierH / 2))
-	//							{
-
-	//								m_barriers[k]->LoseALife();
-	//								m_aliens[i].at(j)->DestroyBullet();
-	//								m_aliens[i].at(j)->SetBulletReset();
-	//								return;
-
-	//							}
-
-	//						}
-
-	//					}
-	//					// Process the player
-	//					if ((fBulletX + fBulletR > fPlayerX - fPlayerW / 2) &&
-	//						(fBulletX - fBulletR < fPlayerX + fPlayerW / 2) &&
-	//						(fBulletY + fBulletR > fPlayerY - fPlayerH / 2) &&
-	//						(fBulletY - fBulletR < fPlayerY + fPlayerH / 2))
-	//					{
-
-	//						m_aliens[i].at(j)->DestroyBullet();
-	//						m_pPlayer->SetHit(true);
-	//						return;
-
-	//					}
-	//					// Process the bounds
-	//					else if (m_aliens[i].at(j)->GetBullet()->GetY() > m_iHeight - m_aliens[i].at(j)->GetBullet()->GetHeight()) {
-
-	//						m_aliens[i].at(j)->DestroyBullet();
-	//						m_aliens[i].at(j)->SetBulletReset();
-	//						return;
-
-	//					}
-
-	//				}
-
-	//			}
-
-	//		}
-
-	//	}
-
-	//}
-
-}
-
-////////////////////////////////////////////////////////////
-
-void CLevel::ProcessCheckForWin() {
-
-	/*if (m_pPlayer->IsHit()) {
-
-		m_iPlayerLives--;
-
-		ResetLevel();
-
-		return;
+	ProcessCollisions(m_pPlayer1);
+	ProcessCollisions(m_pPlayer2);
+
+	std::vector<CRecipe*> _vecRecipes;
+	CRecipe* _recipe1 = m_pPlayer1->GetRecipe();
+	CRecipe* _recipe2 = m_pPlayer2->GetRecipe();
+	_vecRecipes.push_back(_recipe1);
+	_vecRecipes.push_back(_recipe2);
+
+	for (unsigned int i = 0; i < _vecRecipes.size(); i++)
+	{
+		std::vector<CIngredient*> _ingredients = _vecRecipes[i]->getIngredients();
+		for (unsigned int j = 0; j < _ingredients.size(); j++)
+		{
+			_ingredients[j]->Process(_fDeltaTick);
+		}
+	}
+
+	for (unsigned int i = 0; i < m_vecIngredients.size(); i++) 
+	{
+		if (m_vecIngredients[i]->GetY() > m_iHeight) {
+
+			m_vecIngredients.erase(std::remove(m_vecIngredients.begin(), m_vecIngredients.end(), m_vecIngredients[i]), m_vecIngredients.end());
+			continue;
+
+		}
 
 	}
-	else {
 
-		for (int i = 0; i < ALIEN_COLUMNS; i++) {
+}
 
-			for (int j = 0; j < ALIEN_ROWS; j++) {
+void CLevel::ProcessCollisions(CPlayer* _pPlayer)
+{
+	HINSTANCE _hInstance = CGame::GetInstance().GetAppInstance();
 
-				if (!m_aliens[i].at(j)->IsHit()) {
+	if (!_pPlayer->IsFinished())
+	{
 
+		float fPlayerX = _pPlayer->GetX();
+		float fPlayerY = _pPlayer->GetY();
+		float fPlayerH = _pPlayer->GetHeight();
+		float fPlayerW = _pPlayer->GetWidth();
+
+		for (unsigned int i = 0; i < m_vecIngredients.size(); i++)
+		{
+			if (m_vecIngredients[i]->IsActive())
+			{
+				//if (itr != nullptr) {
+
+				float fBulletR = m_vecIngredients[i]->GetRadius();
+				float fBulletX = m_vecIngredients[i]->GetX();
+				float fBulletY = m_vecIngredients[i]->GetY();
+
+				// Process the player
+				if ((fBulletX + fBulletR > fPlayerX - fPlayerW / 2) &&
+					(fBulletX - fBulletR < fPlayerX + fPlayerW / 2) &&
+					(fBulletY + fBulletR > fPlayerY - fPlayerH / 2) &&
+					(fBulletY - fBulletR < fPlayerY + fPlayerH / 2))
+				{
+					m_vecIngredients[i]->SetActive(false);
+					//m_pPlayer->SetHit(true);
+
+					std::vector<CIngredient*> _recipeIngredients = _pPlayer->GetRecipe()->getIngredients();
+
+					bool _bFound = false;
+					for (int j = 0; j < _recipeIngredients.size(); j++)
+					{
+						if (m_vecIngredients[i]->GetType() == _recipeIngredients[j]->GetType())
+						{
+							PlaySound(MAKEINTRESOURCE(IDR_WAVE3), _hInstance, SND_ASYNC | SND_RESOURCE);
+
+							//mciSendString(L"Open \sound1.wav\ type waveaudio", NULL, 0, 0);
+							//mciSendString(L"Play \sound1.wav", NULL, 0, 0);
+
+							_recipeIngredients[j]->SetActive(false);
+							//_pPlayer->AddToScore(100);
+							_bFound = true;
+						}
+
+					}
+					if (!_bFound)
+					{
+						PlaySound(MAKEINTRESOURCE(IDR_WAVE2), _hInstance, SND_ASYNC | SND_RESOURCE);
+						//mciSendString(L"Open \sound2.wav\ type waveaudio", NULL, 0, 0);
+						//mciSendString(L"Play \sound2.wav", NULL, 0, 0);
+
+						_pPlayer->AddToScore(10);
+						
+					}
+					UpdateScoreText();
+					return;
+				}
+				// Process the bounds
+				/*else if (m_aliens[i].at(j)->GetBullet()->GetY() > m_iHeight - m_aliens[i].at(j)->GetBullet()->GetHeight())
+				{
+
+					m_aliens[i].at(j)->DestroyBullet();
+					m_aliens[i].at(j)->SetBulletReset();
 					return;
 
-				}
+				}*/
 
 			}
 
@@ -675,27 +314,40 @@ void CLevel::ProcessCheckForWin() {
 
 	}
 
-	CGame::GetInstance().GetLevel()->NextLevel();*/
+}
+
+////////////////////////////////////////////////////////////
+
+
+void CLevel::ResetScore()
+{
+
+	m_pPlayer1->ResetScore();
+	m_pPlayer2->ResetScore();
 
 }
 
-void CLevel::ResetScore() {
+int CLevel::GetScoreA() const
+{
 
-	m_iScore = 0;
-
-}
-
-int CLevel::GetScore() const {
-
-	return (m_iScore);
+	return (m_pPlayer1->GetScore());
 
 }
 
-void CLevel::DrawScore() {
+int CLevel::GetScoreB() const
+{
+
+	return (m_pPlayer2->GetScore());
+
+}
+
+void CLevel::DrawScore()
+{
 
 	HDC hdc = CGame::GetInstance().GetBackBuffer()->GetBFDC();
 
-	const int kiX = m_iWidth - 10;
+	const int kiXa = m_iWidth / 2 - 10;
+	const int kiXb = m_iWidth - 10;
 	const int kiY = m_iHeight;
 	SetBkMode(hdc, TRANSPARENT);
 
@@ -707,9 +359,10 @@ void CLevel::DrawScore() {
 		"SmackyFormula");
 
 	SelectObject(hdc, font);
-	SetTextColor(hdc, RGB(255, 255, 255));
+	SetTextColor(hdc, RGB(0, 0, 0));
 	SetTextAlign(hdc, TA_RIGHT);
-	TextOutA(hdc, kiX, kiY, m_strScore.c_str(), static_cast<int>(m_strScore.size()));
+	TextOutA(hdc, kiXa, kiY, m_strScoreA.c_str(), static_cast<int>(m_strScoreA.size()));
+	TextOutA(hdc, kiXb, kiY, m_strScoreB.c_str(), static_cast<int>(m_strScoreB.size()));
 	SetTextColor(hdc, RGB(0, 0, 0));
 
 	DeleteObject(font);
@@ -718,6 +371,9 @@ void CLevel::DrawScore() {
 
 void CLevel::DrawRecipe()
 {
+	float posX = 50.0f;
+	float posY = 100.0f;
+
 	HDC hdc = CGame::GetInstance().GetBackBuffer()->GetBFDC();
 
 	int kiX = 0;
@@ -732,15 +388,22 @@ void CLevel::DrawRecipe()
 		"SmackyFormula");
 
 	SelectObject(hdc, font);
-	
+
 	SetTextAlign(hdc, TA_LEFT);
 	//SetTextAlign(hdc, TA_RIGHT);
-	std::vector<CRecipe*> _vecRecipes = m_recipeManager->getRecipes();
+	std::vector<CRecipe*> _vecRecipes;
+	CRecipe* _recipe1 = m_pPlayer1->GetRecipe();
+	CRecipe* _recipe2 = m_pPlayer2->GetRecipe();
+	_vecRecipes.push_back(_recipe1);
+	_vecRecipes.push_back(_recipe2);
+
 	for (unsigned int i = 0; i < _vecRecipes.size(); i++)
-	{	
+	{
 		kiY = 10;
-		SetTextColor(hdc, RGB(0, 0, 255));
+		posY = 100.0f;
+
 		std::string _strRecipe = _vecRecipes[i]->getName();
+		SetTextColor(hdc, RGB(0, 0, 0));
 		TextOutA(hdc, kiX, kiY, _strRecipe.c_str(), static_cast<int>(_strRecipe.size()));
 
 		std::vector<CIngredient*> _ingredients = _vecRecipes[i]->getIngredients();
@@ -754,16 +417,27 @@ void CLevel::DrawRecipe()
 			{
 				kiY += 20;
 			}
-			
-			SetTextColor(hdc, RGB(200, 200, 200));
-			SetTextColor(hdc, RGB(0, 0, 0));		
 			std::string _strIngredient = _ingredients[j]->GetName();
+			if (_ingredients[j]->IsActive())
+			{
+				SetTextColor(hdc, RGB(0, 0, 0));
+			}
+			else
+			{
+				SetTextColor(hdc, RGB(200, 200, 200));
+			}
 			TextOutA(hdc, kiX, kiY, _strIngredient.c_str(), static_cast<int>(_strIngredient.size()));
-		}	
+			_ingredients[j]->SetX(posX);
+			_ingredients[j]->SetY(posY);
+			//_ingredients[j]->Draw();
 
-		kiX = m_iWidth / 2 + 5;		
+			posY += 50.0f;
+		}
+
+		kiX = m_iWidth / 2 + 5;
+		posX += m_iWidth / 2 + 50;
 	}
-	
+
 	//SetTextColor(hdc, RGB(0, 0, 0));
 
 	DeleteObject(font);
@@ -771,8 +445,11 @@ void CLevel::DrawRecipe()
 
 void CLevel::UpdateScoreText() {
 
-	m_strScore = "SCORE: ";
-	m_strScore += ToString(m_iScore);
+	m_strScoreA = "SCORE: ";
+	m_strScoreA += ToString(m_pPlayer1->GetScore());
+
+	m_strScoreB = "SCORE: ";
+	m_strScoreB += ToString(m_pPlayer2->GetScore());
 
 }
 
@@ -787,82 +464,52 @@ void CLevel::ResetLevel() {
 
 	//}
 
-	//m_lifeIcons.clear();
-
-	//// Draw the lives
-	//for (int i = 0; i < m_iPlayerLives; i++) {
-
-	//	CPlaceHolder* icon = new CPlaceHolder();
-	//	icon->Initialise();
-	//	icon->ChangeImage(IDB_PLAYER_LIFE, IDB_PLAYER_LIFE_MASK);
-	//	icon->SetX(30.0f + (i * 40.0f));
-	//	icon->SetY(m_iHeight + 10.0f);
-
-	//	m_lifeIcons.push_back(icon);
-
-	//}
-
-	m_pPlayer = new CPlayer();
-	m_pPlayer->Initialise();
+	m_pPlayer1 = new CPlayer(true);
+	m_pPlayer1->Initialise();
 
 	// Set the paddle's position to be centered on the x, 
 	// and a little bit up from the bottom of the window.
-	m_pPlayer->SetX(m_iWidth / 2.0f);
-	m_pPlayer->SetY(m_iHeight - (2 * m_pPlayer->GetHeight() / 2));
+	m_pPlayer1->SetX(m_iWidth / 2.0f);
+	m_pPlayer1->SetY(m_iHeight - (2 * m_pPlayer1->GetHeight() / 2));
 
 }
 
-void CLevel::NextLevel() {
-
-	Initialise(m_iWidth, m_iHeight + 35);
-
-	SetAlienShipSpeed(m_iPreviousAlienShipSpeed + 10.0f);
-
+void CLevel::CreateRecipe()
+{
+	int iNumberOfRecipes = 6;
+	int randomRecipe = (rand() % iNumberOfRecipes);
+	m_pPlayer1->SetRecipe(new CRecipe(randomRecipe));
+	m_pPlayer2->SetRecipe(new CRecipe(randomRecipe));
 }
 
-void CLevel::SetAlienShipSpeed(float _fSpeed) {
+void CLevel::CheckGameOver()
+{
+	bool bPlayer1Finshed = m_pPlayer1->IsFinished();
+	bool bPlayer2Finshed = m_pPlayer2->IsFinished();
 
-	/*for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-		for (int j = 0; j < ALIEN_ROWS; j++) {
-
-			m_aliens[i].at(j)->SetShipSpeed(_fSpeed);
-
+	if (bPlayer1Finshed && !bPlayer2Finshed)
+	{
+		if (!m_pPlayer1->GetBonusAward())
+		{
+			//m_pPlayer1->AddToScore(1000);
+			m_pPlayer1->AddToScore(-50);
+			m_pPlayer1->SetBonusAward(true);
+			UpdateScoreText();
 		}
-
-	}*/
-
-}
-
-void CLevel::SetAlienBulletSpeed(float _fSpeed) {
-
-	/*for (int i = 0; i < ALIEN_COLUMNS; i++) {
-
-		for (int j = 0; j < ALIEN_ROWS; j++) {
-
-			m_aliens[i].at(j)->SetBulletSpeed(_fSpeed);
-
+	}
+	if (!bPlayer1Finshed && bPlayer2Finshed)
+	{
+		if (!m_pPlayer2->GetBonusAward())
+		{
+			//m_pPlayer2->AddToScore(1000);
+			m_pPlayer2->AddToScore(-50);
+			m_pPlayer2->SetBonusAward(true);
+			UpdateScoreText();
 		}
-
-	}*/
-
-}
-
-CPlayer* CLevel::GetPlayer() const {
-
-	return (m_pPlayer);
-
-}
-
-int CLevel::GetAliensRemaining() const {
-
-	return (m_iAliensRemaining);
-
-}
-
-void CLevel::SetAliensRemaining(int _i) {
-
-	m_iAliensRemaining = _i;
-	UpdateScoreText();
-
+	}
+	if (bPlayer1Finshed && bPlayer2Finshed)
+	{
+		m_vecIngredients.clear();
+		CGame::GetInstance().GameOver();
+	}
 }

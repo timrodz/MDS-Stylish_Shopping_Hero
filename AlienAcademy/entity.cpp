@@ -27,14 +27,11 @@ CEntity::~CEntity()
 	m_pSprite = 0;
 }
 
-//bool
-//CEntity::Initialise(const int _kiSpriteID, const int _kiMaskID)
 bool CEntity::Initialise(std::wstring _strFileName, std::wstring _strFileMask, int _iWidth, int _iHeight)
 {
 	//if (m_pSprite == nullptr)
 	m_pSprite = new CSprite();
 
-	//VALIDATE(m_pSprite->Initialise(_kiSpriteID, _kiMaskID));
 	VALIDATE(m_pSprite->Initialise(_strFileName, _strFileMask, _iWidth, _iHeight));
 
 	return (true);

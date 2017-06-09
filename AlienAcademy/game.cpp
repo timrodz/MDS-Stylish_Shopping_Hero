@@ -6,7 +6,7 @@
 #include "BackBuffer.h"
 #include "utils.h"
 #include "placeholder.h"
-//#include "resource.h"
+#include "resource.h"
 #include "cursor.h"
 
 // This Include
@@ -36,8 +36,8 @@ CGame::~CGame() {
 	delete m_pLevel;
 	m_pLevel = 0;
 
-	delete m_pBackBuffer;
-	m_pBackBuffer = 0;
+	//delete m_pBackBuffer;
+	//m_pBackBuffer = 0;
 
 	delete m_pClock;
 	m_pClock = 0;
@@ -50,8 +50,9 @@ CGame::~CGame() {
 
 }
 
-bool
-CGame::Initialise(HINSTANCE _hInstance, HWND _hWnd, int _iWidth, int _iHeight) {
+bool CGame::Initialise(HINSTANCE _hInstance, HWND _hWnd, int _iWidth, int _iHeight, CBackBuffer* _pBackBuffer)
+{
+	PlaySound(MAKEINTRESOURCE(IDR_WAVE1), _hInstance, SND_ASYNC | SND_RESOURCE | SND_LOOP);
 
 	ShowCursor(true);
 
@@ -62,16 +63,17 @@ CGame::Initialise(HINSTANCE _hInstance, HWND _hWnd, int _iWidth, int _iHeight) {
 	VALIDATE(m_pClock->Initialise());
 	m_pClock->Process();
 
-	m_pBackBuffer = new CBackBuffer();
-	VALIDATE(m_pBackBuffer->Initialise(_hWnd, _iWidth, _iHeight));
+	m_pBackBuffer = _pBackBuffer;
+	//m_pBackBuffer = new CBackBuffer();
+	//VALIDATE(m_pBackBuffer->Initialise(_hWnd, _iWidth, _iHeight));
 
 	m_pLevel = new CLevel();
 	VALIDATE(m_pLevel->Initialise(_iWidth, _iHeight));
 
-	m_pCursor = new CCursor(3);
+	m_pCursor = new CCursor(4);
 	VALIDATE(m_pCursor->Initialise());
-	m_pCursor->SetX(175);
-	m_pCursor->SetY(510);
+	m_pCursor->SetX(375);
+	m_pCursor->SetY(465);
 
 	m_pBackground = new CPlaceHolder();
 	VALIDATE(m_pBackground->Initialise());
@@ -103,7 +105,8 @@ CGame::Draw() {
 
 		SetBkMode(hdc, TRANSPARENT);
 
-		std::string m_strScore = "SCORE: " + std::to_string(m_pLevel->GetScore());
+		std::string m_strScoreA = "Player 1: " + std::to_string(m_pLevel->GetScoreA());
+		std::string m_strScoreB = "Player 2: " + std::to_string(m_pLevel->GetScoreB());
 
 		HFONT font = CreateFontA(90, 54, 0, 0,
 			FW_NORMAL, FALSE, FALSE, FALSE,
@@ -113,10 +116,32 @@ CGame::Draw() {
 			"SmackyFormula");
 
 		SelectObject(hdc, font);
-		SetTextColor(hdc, RGB(255, 255, 255));
-		SetTextAlign(hdc, TA_CENTER);
-		TextOutA(hdc, m_pBackground->GetWidth() / 2.0f, 450.0f, m_strScore.c_str(), static_cast<int>(m_strScore.size()));
 		SetTextColor(hdc, RGB(0, 0, 0));
+		SetTextAlign(hdc, TA_CENTER);
+		TextOutA(hdc, (int) m_pBackground->GetWidth() / 2, 250, m_strScoreA.c_str(), static_cast<int>(m_strScoreA.size()));
+		TextOutA(hdc, (int)m_pBackground->GetWidth() / 2, 350, m_strScoreB.c_str(), static_cast<int>(m_strScoreB.size()));
+		SetTextColor(hdc, RGB(0, 0, 0));
+
+		std::string m_strGameOver;
+		std::string m_strPressEnter = "***press enter***";
+
+		if (m_pLevel->GetScoreA() > m_pLevel->GetScoreB())
+		{
+			m_strGameOver = "Player 2 Wins!";
+		}
+		else if (m_pLevel->GetScoreA() < m_pLevel->GetScoreB())
+		{
+			m_strGameOver = "Player 1 Wins!";
+		}
+		else
+		{
+			m_strGameOver = "Draw!";
+		}
+
+		TextOutA(hdc, (int)m_pBackground->GetWidth() / 2, 0, m_strGameOver.c_str(), static_cast<int>(m_strGameOver.size()));
+		TextOutA(hdc, (int)m_pBackground->GetWidth() / 2, 650, m_strPressEnter.c_str(), static_cast<int>(m_strPressEnter.size()));
+
+		
 
 		DeleteObject(font);
 
@@ -140,7 +165,7 @@ void CGame::Process(float _fDeltaTick)
 		m_pLevel->Process(_fDeltaTick);
 		break;
 	case GAMEOVER:
-		m_pLevel->SetLives(3);
+//		m_pLevel->SetLives(3);
 		break;
 	}
 }
@@ -208,9 +233,9 @@ CGame::GetWindow() {
 
 }
 
-void CGame::GameOver() {
+void CGame::GameOver() 
+{
 
-	//m_pBackground->ChangeImage(IDB_GAMEOVER, IDB_BACKGROUNDMASK);
 	m_pBackground->ChangeImage(L"Sprites\\Game Over.bmp", L"Sprites\\BackgroundMask.bmp");
 	m_iState = GAMEOVER;
 

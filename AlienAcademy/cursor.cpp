@@ -10,7 +10,7 @@
 // This Include
 #include "cursor.h"
 
-#define Y_POS_MOVE 75
+#define Y_POS_MOVE 65
 
 // Implementation
 CCursor::CCursor()

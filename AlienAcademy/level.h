@@ -16,11 +16,6 @@
 // Prototypes
 class CIngredient;
 class CPlayer;
-class CAlien;
-class CBarrier;
-class CFPSCounter;
-class CPlaceHolder;
-class CRecipeManager;
 
 class CLevel
 {
@@ -34,19 +29,16 @@ public:
 	virtual void Draw();
 	virtual void Process(float _fDeltaTick);
 
-	void SetLives(int _iLives);
-
 	void ResetLevel();
-	void NextLevel();
-	void SetAlienShipSpeed(float _fSpeed);
-	void SetAlienBulletSpeed(float _fSpeed);
 
 	void ResetScore();
-	int GetScore() const;
+	int GetScoreA() const;
+	int GetScoreB() const;
+
+	void CreateRecipe();
+	void CheckGameOver();
 
 protected:
-	void ProcessPlayerBulletCollision();
-	void ProcessAlienBulletCollision();
 
 	void ProcessCheckForWin();
 
@@ -54,12 +46,11 @@ protected:
 	void DrawScore();
 	void DrawRecipe();
 
+	void ProcessCollisions(CPlayer* _pPlayer);
+
 public:
-	CPlayer* GetPlayer() const;
 
 protected:
-	int GetAliensRemaining() const;
-	void SetAliensRemaining(int _i);
 
 private:
 	CLevel(const CLevel& _kr);
@@ -67,37 +58,27 @@ private:
 
 	// Member Variables
 protected:
-	CPlayer* m_pPlayer;
+	CPlayer* m_pPlayer1;
 	CPlayer* m_pPlayer2;
-	std::vector<CAlien*> m_aliens[11];
-	CAlien* m_pSpecialAlien;
-	bool m_bSpecialAlien;
 
-	std::vector<CIngredient*> m_vecEnemyBullets;
+	std::vector<CIngredient*> m_vecFixedIngredients;
 
-	CFPSCounter* m_fpsCounter;
+	std::vector<CIngredient*> m_vecIngredients;
 
-	std::string m_strScore;
+	std::string m_strScoreA;
+	std::string m_strScoreB;
 
 	int m_iWidth;
 	int m_iHeight;
 
-	int m_iAliensRemaining;
-
-	static int m_iPlayerLives;
-
-	int m_iLowestAlien[10];
-
-	CRecipeManager* m_recipeManager;
-
 private:
-	int m_iPreviousAlienShipSpeed;
 
-	static int m_iScore;
-	std::vector<CBarrier*> m_barriers;
-	std::vector<CPlaceHolder*> m_lifeIcons;
+	static int m_iScoreA;
+	static int m_iScoreB;
 
 	float fTimer;
+
+	int iIndex;
 };
 
 #endif    // __LEVEL_H__

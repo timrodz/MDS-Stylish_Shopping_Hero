@@ -5,18 +5,18 @@
 #include <time.h>
 
 //Local Includes
-//#include "resource.h"
+#include "resource.h"
 #include "Game.h"
 #include "Clock.h"
 #include "utils.h"
-//#include "level.h"
+#include "level.h"
 //#include "player.h"
 #include "placeholder.h"
 #include "cursor.h"
+#include "backbuffer.h"
 
 // Constants
 #define WINDOW_CLASS_NAME L"BSENGGFRAMEWORK"
-//const int kiWidth = 762;
 const int kiWidth = 1300;
 const int kiHeight = 800;
 
@@ -27,149 +27,14 @@ static int g_hCurrentPlayerBulletSpeed;
 static int g_hCurrentAlienShipSpeed;
 static int g_hCurrentAlienBulletSpeed;
 
+HWND ghwnd;
+
+CBackBuffer* gpBackBuffer = 0;
+
 BOOL CALLBACK
 DebugWindowProc(HWND _hDlg, UINT _uiMsg, WPARAM _wParam, LPARAM _lParam) {
 
 	switch (_uiMsg) {
-
-	/*case WM_INITDIALOG:
-	{
-
-		switch (g_hCurrentPlayerShipSpeed) {
-
-		case -1:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_PLAYER_SHIP_SLOW), BST_CHECKED);
-			break;
-		case 0:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_PLAYER_SHIP_DEFAULT), BST_CHECKED);
-			break;
-		default:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_PLAYER_SHIP_FAST), BST_CHECKED);
-			break;
-
-		}
-
-		switch (g_hCurrentPlayerBulletSpeed) {
-
-		case -1:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_PLAYER_BULLET_SLOW), BST_CHECKED);
-			break;
-		case 0:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_PLAYER_BULLET_DEFAULT), BST_CHECKED);
-			break;
-		default:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_PLAYER_BULLET_FAST), BST_CHECKED);
-			break;
-
-		}
-
-		switch (g_hCurrentAlienShipSpeed) {
-
-		case -1:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_ALIEN_SHIP_SLOW), BST_CHECKED);
-			break;
-		case 0:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_ALIEN_SHIP_DEFAULT), BST_CHECKED);
-			break;
-		default:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_ALIEN_SHIP_FAST), BST_CHECKED);
-			break;
-
-		}
-
-		switch (g_hCurrentAlienBulletSpeed) {
-
-		case -1:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_ALIEN_BULLET_SLOW), BST_CHECKED);
-			break;
-		case 0:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_ALIEN_BULLET_DEFAULT), BST_CHECKED);
-			break;
-		default:
-			Button_SetCheck(GetDlgItem(_hDlg, IDC_ALIEN_BULLET_FAST), BST_CHECKED);
-			break;
-
-		}
-
-		return TRUE;
-		break;
-
-	}*/
-
-	//case WM_COMMAND:
-	//{
-
-	//	switch (LOWORD(_wParam)) {
-
-	//		// Player ship speed
-	//	case IDC_PLAYER_SHIP_SLOW:
-	//		g_hCurrentPlayerShipSpeed = -1;
-	//		CGame::GetInstance().GetLevel()->GetPlayer()->SetShipSpeed(350);
-	//		break;
-	//	case IDC_PLAYER_SHIP_DEFAULT:
-	//		g_hCurrentPlayerShipSpeed = 0;
-	//		CGame::GetInstance().GetLevel()->GetPlayer()->SetShipSpeed(550);
-	//		break;
-	//	case IDC_PLAYER_SHIP_FAST:
-	//		g_hCurrentPlayerShipSpeed = 1;
-	//		CGame::GetInstance().GetLevel()->GetPlayer()->SetShipSpeed(950);
-	//		break;
-
-	//		// Player Bullet Speed
-	//	case IDC_PLAYER_BULLET_SLOW:
-	//		g_hCurrentPlayerBulletSpeed = -1;
-	//		CGame::GetInstance().GetLevel()->GetPlayer()->SetBulletSpeed(350);
-	//		break;
-	//	case IDC_PLAYER_BULLET_DEFAULT:
-	//		g_hCurrentPlayerBulletSpeed = 0;
-	//		CGame::GetInstance().GetLevel()->GetPlayer()->SetBulletSpeed(750);
-	//		break;
-	//	case IDC_PLAYER_BULLET_FAST:
-	//		g_hCurrentPlayerBulletSpeed = 1;
-	//		CGame::GetInstance().GetLevel()->GetPlayer()->SetBulletSpeed(2500);
-	//		break;
-
-	//		// Alien ship speed
-	//	case IDC_ALIEN_SHIP_SLOW:
-	//		g_hCurrentAlienShipSpeed = -1;
-	//		CGame::GetInstance().GetLevel()->SetAlienShipSpeed(10);
-	//		break;
-	//	case IDC_ALIEN_SHIP_DEFAULT:
-	//		g_hCurrentAlienShipSpeed = 0;
-	//		CGame::GetInstance().GetLevel()->SetAlienShipSpeed(20);
-	//		break;
-	//	case IDC_ALIEN_SHIP_FAST:
-	//		g_hCurrentAlienShipSpeed = 1;
-	//		CGame::GetInstance().GetLevel()->SetAlienShipSpeed(1000);
-	//		break;
-
-	//		// Alien bullet speed
-	//	case IDC_ALIEN_BULLET_SLOW:
-	//		g_hCurrentAlienBulletSpeed = -1;
-	//		CGame::GetInstance().GetLevel()->SetAlienBulletSpeed(50);
-	//		break;
-	//	case IDC_ALIEN_BULLET_DEFAULT:
-	//		g_hCurrentAlienBulletSpeed = 0;
-	//		CGame::GetInstance().GetLevel()->SetAlienBulletSpeed(125);
-	//		break;
-	//	case IDC_ALIEN_BULLET_FAST:
-	//		g_hCurrentAlienBulletSpeed = 1;
-	//		CGame::GetInstance().GetLevel()->SetAlienBulletSpeed(250);
-	//		break;
-
-	//	case IDOK:
-
-	//		CClock::SetIsPaused(false);
-	//		EndDialog(_hDlg, 0);
-
-	//		break;
-
-	//	}
-
-	//	return TRUE;
-	//	break;
-
-	//}
 
 	case WM_CLOSE:
 	{
@@ -189,6 +54,7 @@ DebugWindowProc(HWND _hDlg, UINT _uiMsg, WPARAM _wParam, LPARAM _lParam) {
 LRESULT CALLBACK
 WindowProc(HWND _hWnd, UINT _uiMsg, WPARAM _wParam, LPARAM _lParam) {
 
+	HINSTANCE _hInstance = CGame::GetInstance().GetAppInstance();
 	switch (_uiMsg) {
 
 	case WM_KEYUP:
@@ -203,36 +69,42 @@ WindowProc(HWND _hWnd, UINT _uiMsg, WPARAM _wParam, LPARAM _lParam) {
 
 				switch (CGame::GetInstance().GetCursor()->GetCursorChoice()) {
 
-				case 1:
-					//CGame::GetInstance().GetLevel()->Initialise(746, 762);
-					//CGame::GetInstance().GetLevel()->ResetScore();
-					CGame::GetInstance().SetState(PLAY);
-					//CGame::GetInstance().GetBackGround()->ChangeImage(IDB_BACKGROUND, IDB_BACKGROUNDMASK);
-					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\BackgroundCopy.bmp", L"Sprites\\BackgroundMask.bmp");
-					break;
 				case 2:
-					CGame::GetInstance().SetState(CREDITS);
-					//CGame::GetInstance().GetBackGround()->ChangeImage(IDB_CREDITS, IDB_BACKGROUNDMASK);
-					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\Credits.bmp", L"Sprites\\BackgroundMask.bmp");
+					RECT _rect;
+					GetClientRect(ghwnd, &_rect);
+					CGame::GetInstance().Initialise(g_hInstance, ghwnd, _rect.right, _rect.bottom, gpBackBuffer);
+					CGame::GetInstance().GetLevel()->Initialise(_rect.right, _rect.bottom);
+					//CGame::GetInstance().GetLevel()->Initialise(kiWidth, kiHeight);
+					CGame::GetInstance().GetLevel()->ResetScore();
+					CGame::GetInstance().SetState(PLAY);
+					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\MarbleBackground.bmp", L"Sprites\\BackgroundMask.bmp");
+
+					PlaySound(MAKEINTRESOURCE(IDR_WAVE4), _hInstance, SND_ASYNC | SND_RESOURCE);
 					break;
 				case 3:
+					CGame::GetInstance().SetState(CREDITS);
+					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\Credits.bmp", L"Sprites\\BackgroundMask.bmp");
+					break;
+				case 1:
+					CGame::GetInstance().SetState(CREDITS);
+					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\wallpaper story.bmp", L"Sprites\\wallpaper story Mask.bmp");
+					break;
+				case 4:
 					PostQuitMessage(0);
 					break;
 
 				}
 
 			}
-			else if (CGame::GetInstance().GetState() == CREDITS) {
-
+			else if (CGame::GetInstance().GetState() == CREDITS) 
+			{
 				CGame::GetInstance().SetState(MENU);
-				//CGame::GetInstance().GetBackGround()->ChangeImage(IDB_MENU_1, IDB_BACKGROUNDMASK);
 				CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\Menu.bmp", L"Sprites\\BackgroundMask.bmp");
-
 			}
-			else if (CGame::GetInstance().GetState() == GAMEOVER) {
+			else if (CGame::GetInstance().GetState() == GAMEOVER) 
+			{
 
 				CGame::GetInstance().SetState(MENU);
-				//CGame::GetInstance().GetBackGround()->ChangeImage(IDB_MENU_1, IDB_BACKGROUNDMASK);
 				CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\Menu.bmp", L"Sprites\\BackgroundMask.bmp");
 			}
 
@@ -246,23 +118,37 @@ WindowProc(HWND _hWnd, UINT _uiMsg, WPARAM _wParam, LPARAM _lParam) {
 	case WM_KEYDOWN:
 	{
 
-		/*switch (WPARAM(_wParam)) {
+		switch (WPARAM(_wParam)) {
 
 		case VK_ESCAPE:
 
-			if (CGame::GetInstance().GetState() == PLAY) {
+			PostQuitMessage(0);
 
-				DialogBox(g_hInstance, MAKEINTRESOURCE(DEBUG_WINDOW), NULL, DebugWindowProc);
-
-				CClock::SetIsPaused(true);
-
-			}
+			return(0);
 
 			break;
-		}*/
+		}
 
 	}
 	break;
+
+	case WM_PAINT:
+	{
+		PAINTSTRUCT ps;
+
+		BeginPaint(_hWnd, &ps);
+
+		if (gpBackBuffer)
+		{
+			gpBackBuffer->Present();
+		}
+
+		EndPaint(_hWnd, &ps);
+
+		return 0;
+	}
+	break;
+
 	case WM_DESTROY:
 	{
 		PostQuitMessage(0);
@@ -341,13 +227,18 @@ WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdline, int _i
 
 	HWND hwnd = CreateAndRegisterWindow(_hInstance, kiWidth, kiHeight, L"Stylish Shopping Hero v1.0.0");
 
+	ghwnd = hwnd;
+
 	srand((unsigned int)time(NULL));
 
 	CGame& rGame = CGame::GetInstance();
 
 	GetClientRect(hwnd, &_rect);
 
-	if (!rGame.Initialise(_hInstance, hwnd, _rect.right, _rect.bottom)) {
+	gpBackBuffer = new CBackBuffer();
+	gpBackBuffer->Initialise(ghwnd, _rect.right, _rect.bottom);
+
+	if (!rGame.Initialise(_hInstance, hwnd, _rect.right, _rect.bottom, gpBackBuffer)) {
 		// Failed
 		return (0);
 
@@ -368,6 +259,10 @@ WinMain(HINSTANCE _hInstance, HINSTANCE _hPrevInstance, LPSTR _lpCmdline, int _i
 		}
 
 	}
+
+	delete gpBackBuffer;
+	gpBackBuffer = 0;
+
 
 	CGame::DestroyInstance();
 

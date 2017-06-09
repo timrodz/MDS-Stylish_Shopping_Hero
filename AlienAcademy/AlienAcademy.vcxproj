@@ -105,6 +105,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,6 +140,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -153,7 +155,6 @@
     <ClCompile Include="placeholder.cpp" />
     <ClCompile Include="player.cpp" />
     <ClCompile Include="recipe.cpp" />
-    <ClCompile Include="recipeManager.cpp" />
     <ClCompile Include="sprite.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -167,9 +168,20 @@
     <ClInclude Include="placeholder.h" />
     <ClInclude Include="player.h" />
     <ClInclude Include="recipe.h" />
-    <ClInclude Include="recipeManager.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="sprite.h" />
     <ClInclude Include="utils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AlienAcademy.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sprites\recorded_sounds\101137__cgeffex__play-ball.wav" />
+    <Media Include="Sprites\recorded_sounds\135936__bradwesson__collectcoin.wav" />
+    <Media Include="Sprites\recorded_sounds\87044__runnerpack__weapcollect.wav" />
+    <Media Include="Sprites\recorded_sounds\menu_sound_test.wav" />
+    <Media Include="Sprites\recorded_sounds\sound1.wav" />
+    <Media Include="Sprites\recorded_sounds\sound2.wav" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

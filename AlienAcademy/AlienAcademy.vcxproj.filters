@@ -60,9 +60,6 @@
     <ClCompile Include="ingredient.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="recipeManager.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="recipe.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
@@ -104,8 +101,33 @@
     <ClInclude Include="recipe.h">
       <Filter>Header Files\Entity</Filter>
     </ClInclude>
-    <ClInclude Include="recipeManager.h">
-      <Filter>Header Files\Entity</Filter>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files\Framework</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AlienAcademy.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="Sprites\recorded_sounds\menu_sound_test.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sprites\recorded_sounds\87044__runnerpack__weapcollect.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sprites\recorded_sounds\135936__bradwesson__collectcoin.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sprites\recorded_sounds\sound1.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sprites\recorded_sounds\sound2.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Sprites\recorded_sounds\101137__cgeffex__play-ball.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
 </Project>
