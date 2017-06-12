@@ -445,10 +445,10 @@ void CLevel::DrawRecipe()
 
 void CLevel::UpdateScoreText() {
 
-	m_strScoreA = "SCORE: ";
+	m_strScoreA = "Penalty: ";
 	m_strScoreA += ToString(m_pPlayer1->GetScore());
 
-	m_strScoreB = "SCORE: ";
+	m_strScoreB = "Penalty: ";
 	m_strScoreB += ToString(m_pPlayer2->GetScore());
 
 }
