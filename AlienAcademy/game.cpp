@@ -70,10 +70,10 @@ bool CGame::Initialise(HINSTANCE _hInstance, HWND _hWnd, int _iWidth, int _iHeig
 	m_pLevel = new CLevel();
 	VALIDATE(m_pLevel->Initialise(_iWidth, _iHeight));
 
-	m_pCursor = new CCursor(4);
+	m_pCursor = new CCursor(5);
 	VALIDATE(m_pCursor->Initialise());
 	m_pCursor->SetX(375);
-	m_pCursor->SetY(465);
+	m_pCursor->SetY(400);
 
 	m_pBackground = new CPlaceHolder();
 	VALIDATE(m_pBackground->Initialise());

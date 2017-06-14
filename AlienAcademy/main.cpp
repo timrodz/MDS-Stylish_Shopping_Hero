@@ -69,7 +69,15 @@ WindowProc(HWND _hWnd, UINT _uiMsg, WPARAM _wParam, LPARAM _lParam) {
 
 				switch (CGame::GetInstance().GetCursor()->GetCursorChoice()) {
 
+				case 1:
+					CGame::GetInstance().SetState(CREDITS);
+					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\Instructions.bmp", L"Sprites\\wallpaper story Mask.bmp");
+					break;
 				case 2:
+					CGame::GetInstance().SetState(CREDITS);
+					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\wallpaper story.bmp", L"Sprites\\wallpaper story Mask.bmp");
+					break;
+				case 3:
 					RECT _rect;
 					GetClientRect(ghwnd, &_rect);
 					CGame::GetInstance().Initialise(g_hInstance, ghwnd, _rect.right, _rect.bottom, gpBackBuffer);
@@ -81,15 +89,11 @@ WindowProc(HWND _hWnd, UINT _uiMsg, WPARAM _wParam, LPARAM _lParam) {
 
 					PlaySound(MAKEINTRESOURCE(IDR_WAVE4), _hInstance, SND_ASYNC | SND_RESOURCE);
 					break;
-				case 3:
+				case 4:
 					CGame::GetInstance().SetState(CREDITS);
 					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\Credits.bmp", L"Sprites\\BackgroundMask.bmp");
 					break;
-				case 1:
-					CGame::GetInstance().SetState(CREDITS);
-					CGame::GetInstance().GetBackGround()->ChangeImage(L"Sprites\\wallpaper story.bmp", L"Sprites\\wallpaper story Mask.bmp");
-					break;
-				case 4:
+				case 5:
 					PostQuitMessage(0);
 					break;
 
